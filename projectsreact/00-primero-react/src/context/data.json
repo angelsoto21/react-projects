@@ -1,0 +1,17 @@
+[
+    {
+        "username": "midudev",
+        "name": "miguel angel duran",
+        "isFollowing": false
+    },
+    {   
+        "username": "pheralb",
+        "name": "pablo hernandez",
+        "isFollowing": false
+    },
+    {   
+        "username": "DukiSSJ",
+        "name": "duki hernandez",
+        "isFollowing": false
+    }
+]
