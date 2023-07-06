@@ -1,56 +1,21 @@
 import { useState } from "react";
-
-const Turns = {
-  X: "x",
-  O: "o",
-};
-
-const ganador = [
-  [0, 1, 2],
-  [3, 4, 5],
-  [6, 7, 8],
-  [0, 3, 6],
-  [1, 4, 7],
-  [2, 5, 8],
-  [0, 4, 8],
-  [2, 4, 6],
-];
-
-const Square = ({ children, updateBoard, index, isSelected }) => {
-  const className = `square ${isSelected ? "is-selected" : ""}`;
-  const handleClick = () => {
-    updateBoard(index);
-  };
-
-  return (
-    <div onClick={handleClick} className={className}>
-      {children}
-    </div>
-  );
-};
+import { Square } from "./components/Square";
+import { Turns } from "./constants";
+import { WinnerModal } from "./components/WinnerModal";
+import { checkwinner, checkEndGame } from "./logic/board";
 
 function App() {
-  const [board, setBoard] = useState(Array(9).fill(null));
-  const [turn, setTurn] = useState(Turns.X);
+  const [board, setBoard] = useState(() => {
+    const BoardFromStorage = window.localStorage.getItem("board");
+    return BoardFromStorage
+      ? JSON.parse(BoardFromStorage)
+      : Array(9).fill(null);
+  });
+  const [turn, setTurn] = useState(() => {
+    const turnFormStorage = window.localStorage.getItem("turn");
+    return turnFormStorage ? turnFormStorage : Turns.X;
+  });
   const [winner, setWinner] = useState(null);
-
-  const checkwinner = (boardToCheck) => {
-    for (const combo of ganador) {
-      const [a, b, c] = combo;
-      if (
-        boardToCheck[a] &&
-        boardToCheck[a] === boardToCheck[b] &&
-        boardToCheck[a] === boardToCheck[c]
-      ) {
-        return boardToCheck[a];
-      }
-    }
-    // si no hay ganador
-    return null;
-  };
-  const checkEndGame = (board) => {
-    return board.every((square) => square !== null);
-  };
 
   const updateBoard = (index) => {
     //para no sobre escribir
@@ -63,6 +28,9 @@ function App() {
 
     const newTurn = turn === Turns.X ? Turns.O : Turns.X;
     setTurn(newTurn);
+    //Guardar aqui partido
+    window.localStorage.setItem("board", JSON.stringify(newBoard));
+    window.localStorage.setItem("turn", newTurn);
 
     //revisar si hay ganador
     // para hacer un console log no puedes poner el estado debes de poner el newWinner en vez del Winner
@@ -78,11 +46,14 @@ function App() {
     setBoard(Array(9).fill(null));
     setTurn(Turns.X);
     setWinner(null);
+    window.localStorage.removeItem('board')
+    window.localStorage.removeItem('turn') 
   };
 
   return (
     <main className="board">
       <h1>Tic tac toe</h1>
+      <button onClick={Reiniciar}>Reset del juego</button>
       <section className="game">
         {board.map((_, index) => {
           return (
@@ -98,19 +69,7 @@ function App() {
         <Square isSelected={turn === Turns.O}>{Turns.O}</Square>
       </section>
 
-      {winner !== null && (
-        <section className="winner">
-          <div className="text">
-            <h2>{winner === false ? "Empate" : "Gano:"}</h2>
-            <header className="win">
-              {winner && <Square>{winner}</Square>}
-            </header>
-            <footer>
-              <button onClick={Reiniciar}>Empezar de nuevo</button>
-            </footer>
-          </div>
-        </section>
-      )}
+      <WinnerModal winner={winner} Reiniciar={Reiniciar} />
     </main>
   );
 }
