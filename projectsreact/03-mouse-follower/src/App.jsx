@@ -20,7 +20,10 @@ function App() {
       window.removeEventListener('pointermove', handleMove)
     }
   }, [enable]);
-  return (
+  // [] -> solo se ejecuta una vez cuando se monta el componente
+  //[enable] -> se ejecuta cuando cambia enable y cuando se monta el componente
+  // undefined -> se ejecuta cada vez que renderiza el componente
+  return (  
     <main>
       <div
         style={{
